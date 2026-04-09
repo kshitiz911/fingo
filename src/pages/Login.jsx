@@ -9,15 +9,14 @@ export default function Login() {
 
   function handleSignIn(e) {
     e.preventDefault();
-    if (!email.trim()) { setError('Please enter your email.'); return; }
     setError('');
     setLoading(true);
-    // Simulate auth — in real app call your API here
+    // Simulate auth — email optional for showcase
     setTimeout(() => {
       signIn({
         name: 'Harsh',
-        email: email,
-        avatar: email[0].toUpperCase(),
+        email: email.trim() || 'harsh@fingo.app',
+        avatar: email.trim() ? email[0].toUpperCase() : 'H',
       });
       setLoading(false);
     }, 800);
