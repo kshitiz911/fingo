@@ -25,7 +25,7 @@ module.exports = {
         subtle:   "#94A3B8",
       },
       fontFamily: {
-        sans:    ["'Inter'", "sans"],
+        sans:    ["'Inter'", "sans-serif"],
         display: ["'Denton'", "sans-serif"],
       },
       fontSize: {
