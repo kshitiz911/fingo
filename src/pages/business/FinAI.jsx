@@ -242,10 +242,12 @@ function CustomizationModal({ onClose }) {
 function WelcomeState() {
   return (
     <div className="flex-1 flex flex-col items-center justify-center gap-4 pb-32">
-      <img src={finAiGif} alt="FinAI" className="w-32 h-32 object-contain" />
+      <div className="w-24 h-24 rounded-full overflow-hidden shadow-[0_8px_30px_rgba(91,33,182,0.25)]">
+        <img src={finAiGif} alt="FinAI" className="w-full h-full object-cover scale-[1.08]" />
+      </div>
       <div className="text-center">
-        <h2 className="text-2xl font-bold text-navy">Welcome to FinAI Business</h2>
-        <p className="text-muted mt-1">
+        <h2 className="page-title">Welcome to FinAI Business</h2>
+        <p className="text-[15px] text-muted mt-2">
           Your Intelligent AI Partner for every {' '}
           <span className="text-primary font-semibold">Business Financial Decision</span>
         </p>
@@ -258,8 +260,8 @@ function WelcomeState() {
           'Alert me on budget overruns',
         ].map((p) => (
           <button key={p}
-            className="text-xs px-3 py-1.5 rounded-full border border-border bg-white
-                       text-muted hover:border-primary hover:text-primary transition-all">
+            className="text-[13px] px-3.5 py-2 rounded-full border border-border bg-white
+                       text-slate-600 hover:border-primary hover:text-primary transition-all">
             {p}
           </button>
         ))}
@@ -486,7 +488,7 @@ export default function FinAI() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Ask about your money e.g., 'Compare April spend vs income'"
+            placeholder="Ask about your business e.g., 'Forecast next quarter cash flow'"
             className="flex-1 text-sm bg-transparent outline-none text-navy placeholder:text-subtle"
           />
           <button className="text-muted hover:text-primary transition-colors">

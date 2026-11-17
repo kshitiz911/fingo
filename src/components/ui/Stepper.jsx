@@ -16,18 +16,18 @@ export default function Stepper({ steps }) {
             <div className="flex flex-col items-center gap-1.5">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold transition-all
                 ${isDone   ? 'bg-primary text-white' :
-                  isActive ? 'bg-amber-500 text-white' :
-                             'bg-slate-200 text-muted'}`}
+                  isActive ? 'bg-white text-primary border-2 border-primary ring-4 ring-primary/10' :
+                             'bg-white text-muted border border-[#CBD5E1]'}`}
               >
                 {isDone ? <Check size={14} /> : i + 1}
               </div>
-              <span className={`text-[11px] font-medium whitespace-nowrap
-                ${isDone ? 'text-primary' : isActive ? 'text-amber-600' : 'text-muted'}`}>
+              <span className={`text-[12px] whitespace-nowrap
+                ${isDone ? 'text-navy font-medium' : isActive ? 'text-primary font-semibold' : 'text-muted font-medium'}`}>
                 {step.label}
               </span>
             </div>
             {i < steps.length - 1 && (
-              <div className={`flex-1 h-0.5 mx-2 mb-4 rounded-full
+              <div className={`flex-1 h-0.5 mx-3 mb-6 rounded-full
                 ${isDone ? 'bg-primary' : 'bg-slate-200'}`}
               />
             )}

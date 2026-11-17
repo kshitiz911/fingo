@@ -226,10 +226,12 @@ function CustomizationModal({ onClose }) {
 function WelcomeState() {
   return (
     <div className="flex-1 flex flex-col items-center justify-center gap-4 pb-32">
-      <img src={finAiGif} alt="FinAI" className="w-32 h-32 object-contain" />
+      <div className="w-24 h-24 rounded-full overflow-hidden shadow-[0_8px_30px_rgba(91,33,182,0.25)]">
+        <img src={finAiGif} alt="FinAI" className="w-full h-full object-cover scale-[1.08]" />
+      </div>
       <div className="text-center">
-        <h2 className="text-2xl font-bold text-navy">Welcome to FinAI Agent</h2>
-        <p className="text-muted mt-1">
+        <h2 className="page-title">Welcome to FinAI Agent</h2>
+        <p className="text-[15px] text-muted mt-2">
           Your Personal AI Advisor for every{' '}
           <span className="text-primary font-semibold">Financial Move</span>
         </p>
@@ -242,8 +244,8 @@ function WelcomeState() {
           'Alert me if I overspend on food',
         ].map((p) => (
           <button key={p}
-            className="text-xs px-3 py-1.5 rounded-full border border-border bg-white
-                       text-muted hover:border-primary hover:text-primary transition-all">
+            className="text-[13px] px-3.5 py-2 rounded-full border border-border bg-white
+                       text-slate-600 hover:border-primary hover:text-primary transition-all">
             {p}
           </button>
         ))}

@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import KpiTile from '../../components/ui/KpiTile';
 import StatusBadge from '../../components/ui/StatusBadge';
-import { AlertTriangle, Clock, CheckCircle, Check, X, HelpCircle } from 'lucide-react';
+import PageHeader from '../../components/ui/PageHeader';
+import SectionHeader from '../../components/ui/SectionHeader';
+import { AlertTriangle, Clock, Check, X, HelpCircle, Download, Plus, ArrowRight } from 'lucide-react';
 
 const EXPENSES = [
   { date: 'Jan 15, 2025', name: 'Tejas Sharma',  sub: '+91 98765 43210', amount: '₹2,500',  status: 'pending' },
@@ -33,112 +35,112 @@ export default function ExpensePlanner() {
 
   return (
     <div className="flex flex-col gap-6">
+      <PageHeader
+        title="Expense Planner"
+        subtitle="Track team spend, approvals and policy exceptions."
+        actions={<button className="btn-primary"><Plus size={15} /> Add Expense</button>}
+      />
+
       {/* KPI tiles */}
       <div className="grid grid-cols-4 gap-4">
-        <KpiTile label="Total Expenses (This Month)" value="₹24,85,670" delta="+12.5% vs last month" deltaType="negative" accent="text-primary" />
-        <KpiTile label="Approved vs Pending" value="7:3" delta="70% Approved, 30% Pending" deltaType="neutral" accent="text-navy" />
-        <KpiTile label="Insurance Coverage"  value="₹75,00,000" delta="4 Active Policies" deltaType="positive" accent="text-navy" />
-        <KpiTile label="Budget Utilization"  value="₹42,850" delta="+15% vs last month" deltaType="warning" accent="text-warning" />
+        <KpiTile label="Total Expenses" sub="This month" value="₹24,85,670" delta="+12.5%" deltaType="negative" />
+        <KpiTile label="Approval Rate" sub="7 approved · 3 pending" value="70%" delta="On track" deltaType="neutral" />
+        <KpiTile label="Reimbursements" sub="Awaiting payout" value="₹3,40,000" delta="15 claims" deltaType="warning" />
+        <KpiTile label="Budget Used" sub="₹42,850 left" value="68%" delta="+15% MoM" deltaType="warning" />
       </div>
 
       {/* Recent expenses */}
       <div className="card">
-        <div className="flex items-center justify-between mb-4">
-          <p className="text-base font-bold text-navy">Recent Expenses</p>
-          <div className="flex gap-2">
-            {['All Departments', 'All Categories', 'All Status'].map((f) => (
-              <select key={f} className="text-xs border border-border rounded-lg px-2 py-1.5 text-muted focus:outline-none focus:border-primary">
-                <option>{f}</option>
-              </select>
-            ))}
-          </div>
-        </div>
+        <SectionHeader
+          title="Recent Expenses"
+          subtitle="Latest submissions across all departments"
+          actions={['All Departments', 'All Categories', 'All Status'].map((f) => (
+            <select key={f} className="input-base py-1.5 text-muted">
+              <option>{f}</option>
+            </select>
+          ))}
+        />
         <table className="w-full text-sm">
           <thead>
-            <tr className="text-xs text-muted border-b border-border">
-              <th className="text-left pb-2 font-medium">Date</th>
-              <th className="text-left pb-2 font-medium">Employee/Payee</th>
-              <th className="text-left pb-2 font-medium">Amount</th>
-              <th className="text-left pb-2 font-medium">Status</th>
-              <th className="text-left pb-2 font-medium">Action</th>
+            <tr className="border-b border-border">
+              <th className="th">Employee / Payee</th>
+              <th className="th">Date</th>
+              <th className="th">Status</th>
+              <th className="th text-right">Amount</th>
+              <th className="th text-right w-20">Receipt</th>
             </tr>
           </thead>
           <tbody>
             {EXPENSES.map((e, i) => (
-              <tr key={i} className="border-b border-border last:border-0">
-                <td className="py-3 text-xs text-muted">{e.date}</td>
-                <td className="py-3">
-                  <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-full bg-slate-200 flex items-center justify-center text-xs font-bold text-slate-600">
+              <tr key={i} className="tr">
+                <td className="py-3.5">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-[12px] font-bold text-primary">
                       {e.name[0]}
                     </div>
                     <div>
-                      <p className="text-xs font-semibold text-navy">{e.name}</p>
-                      <p className="text-[10px] text-muted">{e.sub}</p>
+                      <p className="text-[13px] font-semibold text-navy">{e.name}</p>
+                      <p className="text-[12px] text-muted">{e.sub}</p>
                     </div>
                   </div>
                 </td>
-                <td className="py-3 text-sm font-bold text-navy">{e.amount}</td>
-                <td className="py-3"><StatusBadge status={e.status} /></td>
-                <td className="py-3">
-                  <div className="w-7 h-7 rounded-lg bg-red-50 flex items-center justify-center cursor-pointer hover:bg-red-100 transition">
-                    <span className="text-red-500 text-xs font-bold">PDF</span>
-                  </div>
+                <td className="py-3.5 text-[13px] text-muted">{e.date}</td>
+                <td className="py-3.5"><StatusBadge status={e.status} /></td>
+                <td className="py-3.5 text-[14px] font-semibold text-navy text-right tabular-nums">{e.amount}</td>
+                <td className="py-3.5">
+                  <button className="icon-btn ml-auto" title="Download PDF"><Download size={14} /></button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
-        <button className="text-xs text-primary font-medium mt-3 hover:underline">Show all transactions →</button>
+        <button className="link-action mt-4">Show all expenses <ArrowRight size={14} /></button>
       </div>
 
       {/* Policy alerts + Pending approvals */}
-      <div className="flex gap-4">
-        <div className="card flex-1">
-          <p className="text-sm font-bold text-navy mb-4">Policy Alerts</p>
+      <div className="grid grid-cols-2 gap-4">
+        <div className="card">
+          <SectionHeader title="Policy Alerts" subtitle="Expenses that break company policy" />
           <div className="flex flex-col gap-2">
             {POLICY_ALERTS.map((a, i) => {
               const cfg = alertConfig[a.type];
               return (
-                <div key={i} className={`flex items-center justify-between p-3 rounded-xl border ${cfg.bg}`}>
-                  <div className="flex items-center gap-2">
-                    <cfg.icon size={14} className={cfg.iconColor} />
-                    <span className={`text-xs font-medium ${cfg.text}`}>{a.msg}</span>
+                <div key={i} className={`flex items-center justify-between gap-3 px-4 py-3 rounded-xl border ${cfg.bg}`}>
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <cfg.icon size={16} className={`${cfg.iconColor} shrink-0`} />
+                    <span className={`text-[13px] font-medium ${cfg.text} truncate`}>{a.msg}</span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <button className="text-xs text-primary font-medium hover:underline">View Details</button>
-                    <X size={14} className="text-muted cursor-pointer hover:text-navy transition" />
+                  <div className="flex items-center gap-3 shrink-0">
+                    <button className="text-[12px] font-semibold text-navy hover:underline">View details</button>
+                    <X size={15} className="text-muted cursor-pointer hover:text-navy transition" />
                   </div>
                 </div>
               );
             })}
           </div>
-          <button className="text-xs text-primary font-medium mt-3 hover:underline">Show all Alerts →</button>
+          <button className="link-action mt-4">Show all alerts <ArrowRight size={14} /></button>
         </div>
 
-        <div className="card flex-1">
-          <p className="text-sm font-bold text-navy mb-4">Pending Approvals</p>
-          <div className="flex flex-col gap-3">
+        <div className="card">
+          <SectionHeader title="Pending Approvals" subtitle={`${approvals.length} requests waiting on you`} />
+          <div className="flex flex-col gap-2.5">
             {approvals.map((a) => (
-              <div key={a.id} className="bg-surface rounded-xl p-3">
-                <div className="flex items-center justify-between mb-2">
-                  <div>
-                    <p className="text-sm font-semibold text-navy">{a.name}</p>
-                    <p className="text-xs text-muted">{a.id}</p>
-                  </div>
-                  <p className="text-base font-bold text-navy">{a.amount}</p>
+              <div key={a.id} className="list-row justify-between">
+                <div className="min-w-0">
+                  <p className="text-[13px] font-semibold text-navy">{a.name}</p>
+                  <p className="text-[12px] text-muted">{a.id} · <span className="font-semibold text-navy tabular-nums">{a.amount}</span></p>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex items-center gap-1.5 shrink-0">
                   <button onClick={() => handleAction(a.id, 'approve')}
-                    className="flex items-center gap-1 text-xs bg-green-50 border border-green-200 text-green-700 px-2.5 py-1 rounded-lg hover:bg-green-100 transition font-medium">
-                    <Check size={12} /> Approve
+                    className="flex items-center gap-1 text-[12px] font-semibold bg-primary text-white px-3 py-1.5 rounded-lg hover:bg-primary-dark transition">
+                    <Check size={13} /> Approve
                   </button>
                   <button onClick={() => handleAction(a.id, 'reject')}
-                    className="flex items-center gap-1 text-xs bg-red-50 border border-red-200 text-red-600 px-2.5 py-1 rounded-lg hover:bg-red-100 transition font-medium">
-                    <X size={12} /> Reject
+                    className="flex items-center gap-1 text-[12px] font-semibold bg-white border border-border text-red-600 px-3 py-1.5 rounded-lg hover:border-red-300 hover:bg-red-50 transition">
+                    <X size={13} /> Reject
                   </button>
-                  <button className="flex items-center gap-1 text-xs bg-slate-100 border border-slate-200 text-slate-600 px-2.5 py-1 rounded-lg hover:bg-slate-200 transition font-medium">
-                    <HelpCircle size={12} /> Ask
+                  <button className="icon-btn" title="Ask a question">
+                    <HelpCircle size={14} />
                   </button>
                 </div>
               </div>

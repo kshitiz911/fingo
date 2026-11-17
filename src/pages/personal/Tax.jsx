@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import Stepper from '../../components/ui/Stepper';
 import KpiTile from '../../components/ui/KpiTile';
+import PageHeader from '../../components/ui/PageHeader';
+import SectionHeader from '../../components/ui/SectionHeader';
 import { ArrowRight, FileText, CheckCircle, PiggyBank, BarChart2 } from 'lucide-react';
 
 const TAX_STEPS = [
@@ -28,27 +30,27 @@ const EXPENSE_DATA = [
 ];
 
 const CustomLegend = ({ data }) => (
-  <div className="flex flex-col gap-2 mt-2">
+  <div className="flex flex-col gap-2.5">
     {data.map((d) => (
       <div key={d.name} className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: d.color }} />
-          <span className="text-xs text-muted">{d.name}</span>
+          <span className="text-[12px] text-slate-600">{d.name}</span>
         </div>
-        <span className="text-xs font-semibold text-navy">{d.value}%</span>
+        <span className="text-[12px] font-semibold text-navy tabular-nums">{d.value}%</span>
       </div>
     ))}
   </div>
 );
 
-const DonutChart = ({ data, label }) => (
-  <div className="card flex-1">
-    <p className="text-sm font-semibold text-navy mb-3">{label}</p>
-    <div className="flex gap-4 items-center">
-      <div className="w-36 h-36 shrink-0">
+const DonutChart = ({ data, label, sub }) => (
+  <div className="card">
+    <SectionHeader title={label} subtitle={sub} />
+    <div className="flex gap-8 items-center pr-2">
+      <div className="w-40 h-40 shrink-0">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
-            <Pie data={data} cx="50%" cy="50%" innerRadius={38} outerRadius={62}
+            <Pie data={data} cx="50%" cy="50%" innerRadius={44} outerRadius={70}
               dataKey="value" strokeWidth={2} stroke="#fff">
               {data.map((d, i) => <Cell key={i} fill={d.color} />)}
             </Pie>
@@ -68,36 +70,35 @@ export default function Tax() {
 
   return (
     <div className="flex flex-col gap-6">
+      <PageHeader title="Tax" subtitle="FY 2024-25 · ITR-2 filing in progress." />
+
       {/* KPI tiles */}
       <div className="grid grid-cols-4 gap-4">
-        <KpiTile icon={<FileText size={20} />} iconBg="bg-red-100" iconColor="text-red-500" label="Total Tax Liability" value="₹2,45,000"
-          delta="↑12% vs Last Year" deltaType="negative" accent="text-navy" />
-        <KpiTile icon={<CheckCircle size={20} />} iconBg="bg-green-100" iconColor="text-green-600" label="Deductions Applied" value="₹1,50,000"
-          delta="80% of eligible limit" deltaType="positive" accent="text-navy" />
-        <KpiTile icon={<PiggyBank size={20} />} iconBg="bg-teal-100" iconColor="text-teal-600" label="Expected Savings" value="₹22,500"
-          delta="Based on 24% tax slab" deltaType="positive" accent="text-navy" />
-        <KpiTile icon={<BarChart2 size={20} />} iconBg="bg-blue-100" iconColor="text-blue-600" label="Filling Process" value="85%"
-          delta="Stage 3 of 5" deltaType="neutral" accent="text-navy" />
+        <KpiTile icon={<FileText />}    label="Total Tax Liability" value="₹2,45,000" delta="+12% YoY"      deltaType="negative" sub="vs last year" />
+        <KpiTile icon={<CheckCircle />} label="Deductions Applied"  value="₹1,50,000" delta="80% used"      deltaType="positive" sub="of eligible limit" />
+        <KpiTile icon={<PiggyBank />}   label="Expected Savings"    value="₹22,500"   delta="24% slab"      deltaType="positive" sub="from deductions" />
+        <KpiTile icon={<BarChart2 />}   label="Filing Progress"     value="60%"       delta="Step 3 of 5"   deltaType="neutral"  sub="Calculate" />
       </div>
 
       {/* Stepper */}
       <div className="card">
-          <p className="font-display text-[20px] font-bold font-Denton text-navy mb-4">Filling Progress</p>
+        <SectionHeader
+          title="Filing Progress"
+          subtitle="ITR-2 · due 31 Jul 2025"
+          className="mb-6"
+          actions={
+            <button onClick={() => setStep((s) => Math.min(s + 1, 4))} className="btn-primary">
+              Continue <ArrowRight size={15} />
+            </button>
+          }
+        />
         <Stepper steps={TAX_STEPS} />
-        <button
-          onClick={() => setStep((s) => Math.min(s + 1, 4))}
-          className="mt-6 flex items-center gap-2 btn-primary w-fit">
-          Continue <ArrowRight size={15} />
-        </button>
       </div>
 
       {/* Donut charts */}
-      <div>
-        <p className="font-display text-[20px] font-bold font-Denton text-navy mb-4">Income & Expense Breakdown</p>
-        <div className="flex gap-4">
-          <DonutChart data={INCOME_DATA} label="Income Breakdown" />
-          <DonutChart data={EXPENSE_DATA} label="Expense Breakdown" />
-        </div>
+      <div className="grid grid-cols-2 gap-4">
+        <DonutChart data={INCOME_DATA}  label="Income Breakdown"  sub="Sources of taxable income" />
+        <DonutChart data={EXPENSE_DATA} label="Expense Breakdown" sub="Where deductible spend went" />
       </div>
     </div>
   );

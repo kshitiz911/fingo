@@ -43,8 +43,8 @@ module.exports = {
         icon: "10px", // icon container rounding
       },
       boxShadow: {
-        card:       "0 0px 0px rgba(0,0,0,0.06), 0 0px 0px rgba(0,0,0,0.04)",
-        "card-hover":"0 4px 16px rgba(0,0,0,0.10)",
+        card:       "0 1px 2px rgba(15,23,42,0.04)",
+        "card-hover":"0 6px 20px rgba(15,23,42,0.08)",
       },
       spacing: {
         "sidebar": "220px",

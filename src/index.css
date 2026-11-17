@@ -40,7 +40,8 @@
 }
 
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-feature-settings: 'cv11', 'ss01';
   background-color: var(--color-surface);
   color: var(--color-navy);
   -webkit-font-smoothing: antialiased;
@@ -85,7 +86,48 @@ body {
 
   /* ── Cards ─────────────────────────────────── */
   .card {
-    @apply bg-white rounded-card shadow-card p-5;
+    @apply bg-white rounded-card shadow-card p-5 border border-[#E6EAF0];
+  }
+
+  /* ── Typography roles ──────────────────────────
+     page-title    → one per page, Denton display
+     section-title → card / section headings, Inter
+     overline      → small uppercase group labels
+  ─────────────────────────────────────────── */
+  .page-title {
+    @apply font-display text-[28px] leading-[1.15] font-bold text-navy tracking-[-0.01em];
+  }
+  .page-subtitle {
+    @apply text-[14px] text-muted mt-1;
+  }
+  .eyebrow {
+    @apply text-[11px] font-semibold text-muted uppercase tracking-[0.06em];
+  }
+  .link-action {
+    @apply inline-flex items-center gap-1 text-[13px] font-semibold text-primary hover:underline;
+  }
+
+  /* Inset row used for lists inside cards */
+  .list-row {
+    @apply flex items-center gap-3 rounded-xl border border-[#EEF1F5] bg-[#F8FAFC] px-4 py-3;
+  }
+
+  /* Tables */
+  .th {
+    @apply text-left pb-3 text-[11px] font-semibold text-muted uppercase tracking-[0.06em];
+  }
+  .tr {
+    @apply border-b border-[#EEF1F5] last:border-0;
+  }
+  .icon-btn {
+    @apply w-8 h-8 rounded-lg border border-border bg-white text-muted flex items-center justify-center
+           hover:text-primary hover:border-primary/40 transition-colors;
+  }
+
+  /* Form controls */
+  .input-base {
+    @apply text-[13px] bg-white border border-border rounded-lg px-3 py-2 text-navy
+           placeholder:text-subtle focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/15;
   }
 
   /* ── KPI Tile ───────────────────────────────
@@ -240,7 +282,10 @@ body {
 
   /* ── Section header ─────────────────────────── */
   .section-title {
-    @apply text-[15px] font-semibold text-navy;
+    @apply text-[16px] leading-6 font-semibold text-navy tracking-[-0.005em];
+  }
+  .section-subtitle {
+    @apply text-[13px] text-muted mt-0.5;
   }
 
   /* ── Data table row ─────────────────────────── */

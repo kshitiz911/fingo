@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import Stepper from '../../components/ui/Stepper';
 import KpiTile from '../../components/ui/KpiTile';
-import { Upload, Download, FileText, FileSpreadsheet, AlertTriangle, ArrowRight } from 'lucide-react';
+import PageHeader from '../../components/ui/PageHeader';
+import SectionHeader from '../../components/ui/SectionHeader';
+import Segmented from '../../components/ui/Segmented';
+import StatusBadge from '../../components/ui/StatusBadge';
+import { Upload, Download, FileText, FileSpreadsheet, ArrowRight } from 'lucide-react';
 
 const STEPS = [
   { label: 'Collect Data', status: 'done' },
@@ -14,11 +18,11 @@ const STEPS = [
 const DOC_TABS = ['Receipts', 'Deduction Proofs', 'Returns', 'Certificates'];
 
 const UPLOADED = [
-  { name: 'Form-16-2024.pdf',      icon: FileText,        status: 'verified', statusColor: 'text-positive', bg: 'bg-red-50' },
-  { name: 'Medical-Bills-Q4.xlsx', icon: FileSpreadsheet, status: 'pending',  statusColor: 'text-warning',  bg: 'bg-green-50' },
+  { name: 'Form-16-2024.pdf',      icon: FileText,        status: 'success', label: 'Verified', meta: 'PDF · 248 KB · Uploaded today' },
+  { name: 'Medical-Bills-Q4.xlsx', icon: FileSpreadsheet, status: 'pending', label: 'In review', meta: 'XLSX · 96 KB · Uploaded yesterday' },
 ];
 
-const INVENTORY = ['Tax Summary Report', 'Comparative Analysis', 'Comparative Analysis', 'Comparative Analysis'];
+const INVENTORY = ['Tax Summary Report', 'FY24 vs FY25 Comparison', 'GST Reconciliation', 'TDS Certificates'];
 
 export default function TaxCompliance() {
   const [docTab, setDocTab] = useState('Receipts');
@@ -26,96 +30,93 @@ export default function TaxCompliance() {
 
   return (
     <div className="flex flex-col gap-6">
+      <PageHeader title="Tax & Compliance" subtitle="FY 2024-25 · GST, TDS and corporate tax in one place." />
+
       {/* KPI tiles */}
       <div className="grid grid-cols-4 gap-4">
-        <KpiTile label="Due Soon"    value="₹2,53,900" delta="Total tax payable"              deltaType="negative" accent="text-negative" />
-        <KpiTile label="Applied"     value="₹1,50,000" delta="Deductions via TDS/GST"         deltaType="positive" accent="text-positive" />
-        <KpiTile label="Pending"     value="₹32,5000"  delta="Expected additional deductions" deltaType="warning"  accent="text-warning" />
-        <KpiTile label="Pending"     value="₹32,5000"  delta="Compliance filing progress"     deltaType="neutral"  accent="text-muted" />
+        <KpiTile label="Tax Payable"         sub="GST + TDS"            value="₹2,53,900" delta="Due in 7 days" deltaType="negative" />
+        <KpiTile label="Deductions Applied"  sub="Via TDS / GST credit" value="₹1,50,000" delta="Claimed"       deltaType="positive" />
+        <KpiTile label="Expected Deductions" sub="Proofs outstanding"    value="₹3,25,000" delta="Pending"       deltaType="warning" />
+        <KpiTile label="Filing Progress"     sub="GSTR-3B · September"   value="60%"       delta="Step 3 of 5"   deltaType="neutral" />
       </div>
 
       {/* Stepper */}
       <div className="card">
-        <p className="text-base font-bold text-navy mb-6">Filling Progress</p>
+        <SectionHeader
+          title="Filing Progress"
+          subtitle="Current return: GSTR-3B for September"
+          className="mb-6"
+          actions={<button className="btn-primary">Proceed to next stage <ArrowRight size={15} /></button>}
+        />
         <Stepper steps={STEPS} />
-        <button className="mt-6 btn-primary flex items-center gap-2 w-fit">
-          Proceed to Next Stage <ArrowRight size={15} />
-        </button>
       </div>
 
       {/* Document Vault + Inventory */}
-      <div className="flex gap-4">
+      <div className="grid grid-cols-[1fr_300px] gap-4">
         {/* Vault */}
-        <div className="card flex-1">
-          <div className="flex items-center justify-between mb-4">
-            <p className="text-sm font-bold text-navy">Document Vault</p>
-            <button className="btn-primary text-xs py-1.5 px-3 flex items-center gap-1.5">
-              <Upload size={13} /> Upload Tax Document
-            </button>
-          </div>
+        <div className="card">
+          <SectionHeader
+            title="Document Vault"
+            subtitle="Receipts and proofs used for this filing"
+            actions={<button className="btn-outline"><Upload size={14} /> Upload</button>}
+          />
 
-          {/* Tabs */}
-          <div className="flex gap-1 mb-4 border-b border-border pb-2">
-            {DOC_TABS.map((t) => (
-              <button key={t} onClick={() => setDocTab(t)}
-                className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-all
-                  ${docTab === t ? 'bg-primary text-white' : 'text-muted hover:bg-slate-100'}`}>
-                {t}
-              </button>
-            ))}
+          <div className="mb-4">
+            <Segmented options={DOC_TABS} value={docTab} onChange={setDocTab} />
           </div>
 
           {/* Drop zone */}
-          <div className="border-2 border-dashed border-border rounded-xl p-8 flex flex-col items-center gap-2 mb-4 hover:border-primary transition-colors cursor-pointer">
-            <Upload size={24} className="text-muted" />
-            <p className="text-sm text-muted">Drag & drop or select a file</p>
-            <button className="text-sm text-primary font-semibold hover:underline">Choose File</button>
+          <div className="border border-dashed border-[#CBD5E1] bg-[#F8FAFC] rounded-xl py-7 flex flex-col items-center gap-2 mb-4 hover:border-primary transition-colors cursor-pointer">
+            <div className="w-10 h-10 rounded-full bg-white border border-border flex items-center justify-center">
+              <Upload size={17} className="text-primary" />
+            </div>
+            <p className="text-[13px] text-navy"><span className="font-semibold text-primary">Choose a file</span> or drag it here</p>
+            <p className="text-[12px] text-muted">PDF, XLSX or JPG · up to 10 MB</p>
           </div>
 
           {/* Uploaded files */}
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2.5">
             {UPLOADED.map((f) => (
-              <div key={f.name} className="flex items-center justify-between bg-surface rounded-xl px-3 py-2.5">
-                <div className="flex items-center gap-2">
-                  <div className={`w-8 h-8 rounded-lg ${f.bg} flex items-center justify-center`}>
-                    <f.icon size={15} className="text-muted" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-semibold text-navy">{f.name}</p>
-                    <p className="text-[10px] text-muted">Uploaded recently</p>
-                  </div>
+              <div key={f.name} className="list-row">
+                <div className="w-9 h-9 rounded-lg bg-white border border-border flex items-center justify-center shrink-0">
+                  <f.icon size={16} className="text-navy" />
                 </div>
-                <span className={`text-xs font-semibold capitalize ${f.statusColor}`}>{f.status}</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[13px] font-semibold text-navy truncate">{f.name}</p>
+                  <p className="text-[12px] text-muted">{f.meta}</p>
+                </div>
+                <StatusBadge status={f.status} label={f.label} />
               </div>
             ))}
           </div>
         </div>
 
         {/* Inventory */}
-        <div className="card w-64 shrink-0">
-          <p className="text-sm font-bold text-navy mb-4">Document Inventory</p>
-          <div className="flex flex-col gap-2 mb-6">
-            {INVENTORY.map((doc, i) => (
-              <div key={i} className="flex items-center justify-between py-2 border-b border-border last:border-0">
-                <div className="flex items-center gap-2">
-                  <FileText size={14} className="text-muted" />
-                  <span className="text-xs text-navy font-medium">{doc}</span>
+        <div className="card flex flex-col">
+          <SectionHeader title="Reports" subtitle="Generated for FY 2024-25" />
+          <div className="flex flex-col mb-5">
+            {INVENTORY.map((doc) => (
+              <div key={doc} className="flex items-center justify-between py-3 border-b border-[#EEF1F5] last:border-0">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <FileText size={15} className="text-muted shrink-0" />
+                  <span className="text-[13px] text-navy font-medium truncate">{doc}</span>
                 </div>
-                <button className="text-muted hover:text-primary transition-colors">
-                  <Download size={14} />
+                <button className="text-muted hover:text-primary transition-colors" title="Download">
+                  <Download size={15} />
                 </button>
               </div>
             ))}
           </div>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 mt-auto">
+            <p className="eyebrow">Export format</p>
             <select value={format} onChange={(e) => setFormat(e.target.value)}
-              className="w-full text-xs border border-border rounded-lg px-3 py-2 text-muted focus:outline-none focus:border-primary">
+              className="input-base w-full">
               <option>PDF</option>
               <option>XLS</option>
               <option>PPT</option>
             </select>
-            <button className="btn-primary text-xs py-2 flex items-center justify-center gap-1.5">
-              <Download size={13} /> Download Tax Report
+            <button className="btn-primary justify-center">
+              <Download size={14} /> Download tax report
             </button>
           </div>
         </div>

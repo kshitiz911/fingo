@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
-import { Landmark, GraduationCap, PiggyBank, Diamond, Home, HeartPulse, TrendingUp, ArrowUp, ChevronRight } from 'lucide-react';
+import { Landmark, GraduationCap, PiggyBank, Diamond, Home, HeartPulse, TrendingUp, ChevronRight, Wallet, ShieldCheck, LineChart as LineIcon, IndianRupee } from 'lucide-react';
+import KpiTile from '../../components/ui/KpiTile';
+import PageHeader from '../../components/ui/PageHeader';
+import SectionHeader from '../../components/ui/SectionHeader';
 
 // ── KPI Tiles data ────────────────────────────────────────────────────────────
 // Each tile has its own unique layout — built individually to match design exactly
@@ -24,99 +27,69 @@ const ALLOCATION_DATA = [
 ];
 
 // ── Goal Card ─────────────────────────────────────────────────────────────────
-const GoalCard = ({ icon: Icon, label, value, target, pct, completion }) => (
-  <div className="bg-white rounded-2xl border border-slate-100 shadow-card p-5 flex flex-col gap-3">
-    <div className="flex items-start justify-between">
-      <p className="text-sm font-bold text-navy">{label}</p>
-      <Icon size={20} className="text-primary shrink-0" />
+const GoalCard = ({ icon: Icon, label, value, target, pct }) => (
+  <div className="card flex flex-col gap-4">
+    <div className="flex items-center gap-2.5">
+      <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+        <Icon size={16} />
+      </div>
+      <p className="text-[14px] font-semibold text-navy">{label}</p>
     </div>
-    <p className="text-2xl font-bold text-navy">{value}</p>
-    <p className="text-xs text-muted">{target}</p>
-    <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
-      <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${pct}%` }} />
+    <div>
+      <p className="text-[24px] font-bold text-navy leading-none tabular-nums">{value}</p>
+      <p className="text-[12px] text-muted mt-1.5">{target}</p>
     </div>
-    <p className="text-xs text-muted">{completion}</p>
+    <div>
+      <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+        <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${pct}%` }} />
+      </div>
+      <p className="text-[12px] text-muted mt-2"><span className="font-semibold text-navy">{pct}%</span> of target</p>
+    </div>
   </div>
 );
 
 // ── Main ─────────────────────────────────────────────────────────────────────
 export default function Insurance() {
-  const [growthTab, setGrowthTab] = useState('Daily');
 
   return (
     <div className="flex flex-col gap-6">
 
-      {/* ── KPI Tiles — 4 unique tinted cards ── */}
+      <PageHeader title="Wealth & Insurance" subtitle="Net worth, cover and progress on your financial goals." />
+
+      {/* ── KPI Tiles ── */}
       <div className="grid grid-cols-4 gap-4">
-
-        {/* Total Net Worth — teal tint */}
-        <div className="rounded-2xl border border-teal-100 bg-teal-50/60 px-5 py-4 flex flex-col gap-1">
-          <p className="text-sm font-semibold text-primary">Total Net Worth</p>
-          <p className="text-3xl font-bold text-navy">₹24,85,670</p>
-          <p className="text-xs font-semibold text-positive flex items-center gap-0.5">
-            <ArrowUp size={11} /> +12.5%
-          </p>
-        </div>
-
-        {/* Portfolio Growth — blue tint with toggle */}
-        <div className="rounded-2xl border border-blue-100 bg-blue-50/60 px-5 py-4 flex flex-col gap-1">
-          <p className="text-sm font-semibold text-blue-600">Portfolio Growth</p>
-          <p className="text-3xl font-bold text-navy">+18.2%</p>
-          <div className="flex gap-1 mt-1">
-            {['Daily', 'Weekly', 'Monthly'].map((t) => (
-              <button key={t} onClick={() => setGrowthTab(t)}
-                className={`text-[11px] px-2 py-0.5 rounded-md font-medium transition-all
-                  ${growthTab === t
-                    ? 'bg-primary text-white'
-                    : 'text-muted hover:bg-white/80'}`}>
-                {t}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Insurance Coverage — purple tint */}
-        <div className="rounded-2xl border border-purple-100 bg-purple-50/60 px-5 py-4 flex flex-col gap-1">
-          <p className="text-sm font-semibold text-purple-600">Insurance Coverage</p>
-          <p className="text-3xl font-bold text-navy">₹75,00,000</p>
-          <p className="text-xs font-semibold text-primary">4 Active Policies</p>
-        </div>
-
-        {/* Monthly Returns — green tint */}
-        <div className="rounded-2xl border border-green-100 bg-green-50/60 px-5 py-4 flex flex-col gap-1">
-          <p className="text-sm font-semibold text-green-600">Monthly Returns</p>
-          <p className="text-3xl font-bold text-navy">₹42,850</p>
-          <p className="text-xs font-semibold text-positive flex items-center gap-0.5">
-            <ArrowUp size={11} /> +8.5%
-          </p>
-        </div>
-
+        <KpiTile icon={<Wallet />}      label="Total Net Worth"    value="₹24,85,670" delta="+12.5%"   deltaType="positive" sub="this year" />
+        <KpiTile icon={<LineIcon />}    label="Portfolio Growth"   value="+18.2%"     delta="+0.4% today" deltaType="positive" sub="since Jan" />
+        <KpiTile icon={<ShieldCheck />} label="Insurance Cover"    value="₹75,00,000" delta="4 policies" deltaType="neutral"  sub="Life, health, motor" />
+        <KpiTile icon={<IndianRupee />} label="Monthly Returns"    value="₹42,850"    delta="+8.5%"    deltaType="positive" sub="vs last month" />
       </div>
 
       {/* ── Financial Goals ── */}
       <div>
-          <h2 className="font-display text-[28px] font-bold font-Denton text-navy mb-4">Financial Goals</h2>
+        <SectionHeader
+          title="Financial Goals"
+          subtitle="6 goals · ₹1.62 Cr saved so far"
+          actions={<button className="link-action">Manage goals <ChevronRight size={14} /></button>}
+        />
         <div className="grid grid-cols-3 gap-4">
           {GOALS.map((g) => <GoalCard key={g.label} {...g} />)}
         </div>
-        <button className="flex items-center gap-1 text-sm font-medium text-primary mt-4 hover:underline">
-          Manage Financial Goals <ChevronRight size={15} />
-        </button>
       </div>
 
       {/* ── Asset Allocation ── */}
-      <div className="bg-white rounded-2xl shadow-card p-6">
-        <h2 className="font-display text-[24px] font-bold font-Denton text-navy mb-6">Asset Allocation</h2>
-        <div className="flex gap-6">
+      <div className="card">
+        <SectionHeader title="Asset Allocation" subtitle="How your ₹24.9L portfolio is split" />
+        <div className="grid grid-cols-2 gap-8 items-center">
 
-          {/* Donut chart — left half */}
-          <div className="flex-1 flex items-center justify-center" style={{ minHeight: 280 }}>
-            <ResponsiveContainer width="100%" height={280}>
+          {/* Donut + legend */}
+          <div className="flex items-center gap-8">
+            <div className="w-56 h-56 shrink-0">
+            <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
                   data={ALLOCATION_DATA}
                   cx="50%" cy="50%"
-                  innerRadius={72} outerRadius={118}
+                  innerRadius={66} outerRadius={104}
                   dataKey="value"
                   strokeWidth={3} stroke="#fff"
                   startAngle={90} endAngle={-270}
@@ -127,22 +100,34 @@ export default function Insurance() {
                   contentStyle={{ fontSize: 12, borderRadius: 8, border: '1px solid #E2E8F0' }} />
               </PieChart>
             </ResponsiveContainer>
+            </div>
+            <div className="flex flex-col gap-3 flex-1">
+              {ALLOCATION_DATA.map((d) => (
+                <div key={d.name} className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full" style={{ background: d.color }} />
+                    <span className="text-[13px] text-slate-600">{d.name}</span>
+                  </div>
+                  <span className="text-[13px] font-semibold text-navy tabular-nums">{d.value}%</span>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* Right panel */}
-          <div className="flex-1 flex flex-col gap-4 justify-center">
+          <div className="flex flex-col gap-3">
 
             {/* Total Returns card */}
-            <div className="border border-border rounded-2xl p-4">
-              <p className="text-sm font-bold text-navy mb-2">Total Returns</p>
-              <div className="flex items-end gap-6">
+            <div className="rounded-xl border border-[#EEF1F5] bg-[#F8FAFC] p-4">
+              <p className="eyebrow mb-3">Total returns</p>
+              <div className="flex items-end gap-10">
                 <div>
-                  <p className="text-2xl font-bold text-navy">₹4,85,000</p>
-                  <p className="text-xs text-muted mt-0.5">Absolute Returns</p>
+                  <p className="text-[24px] font-bold text-navy leading-none tabular-nums">₹4,85,000</p>
+                  <p className="text-[12px] text-muted mt-1.5">Absolute</p>
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-primary">14.2%</p>
-                  <p className="text-xs text-muted mt-0.5">CAGR</p>
+                  <p className="text-[24px] font-bold text-primary leading-none tabular-nums">14.2%</p>
+                  <p className="text-[12px] text-muted mt-1.5">CAGR</p>
                 </div>
               </div>
             </div>
@@ -150,15 +135,15 @@ export default function Insurance() {
             {/* Best Performers — side by side */}
             <div className="grid grid-cols-2 gap-3">
               {[
-                { label: 'Best Performer', name: 'Mahindra', val: '+285%' },
-                { label: 'Best Performer', name: 'BYJUS',    val: '+123%' },
+                { label: 'Top performer', name: 'Mahindra', val: '+285%' },
+                { label: 'Runner-up',     name: 'BYJUS',    val: '+123%' },
               ].map((p) => (
-                <div key={p.name} className="border border-border rounded-2xl p-4">
-                  <p className="text-xs text-muted">{p.label}</p>
-                  <p className="text-base font-bold text-navy mt-0.5 flex items-center gap-1">
-                    <TrendingUp size={13} className="text-positive" /> {p.name}
+                <div key={p.name} className="rounded-xl border border-[#EEF1F5] bg-[#F8FAFC] p-4">
+                  <p className="eyebrow">{p.label}</p>
+                  <p className="text-[15px] font-semibold text-navy mt-2">{p.name}</p>
+                  <p className="text-[13px] font-semibold text-positive mt-0.5 flex items-center gap-1">
+                    <TrendingUp size={13} /> {p.val}
                   </p>
-                  <p className="text-sm font-bold text-positive mt-0.5">{p.val}</p>
                 </div>
               ))}
             </div>

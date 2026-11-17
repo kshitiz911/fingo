@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import StatusBadge from '../../components/ui/StatusBadge';
+import PageHeader from '../../components/ui/PageHeader';
+import SectionHeader from '../../components/ui/SectionHeader';
+import Segmented from '../../components/ui/Segmented';
+import QuickAction from '../../components/ui/QuickAction';
 import {
   Send, HandCoins, PlusCircle, Receipt,
   Zap, Flame, Wifi, Tv, Play, MoreHorizontal,
   Edit2, Trash2, FileText, ArrowDownLeft, ArrowUpRight,
-  Settings, Plus,
+  Settings, Plus, Eye, EyeOff, KeyRound, ArrowRight, User, Home as HomeIcon,
 } from 'lucide-react';
 
 /* ── Mock data ─────────────────────────────────────── */
@@ -29,7 +33,7 @@ const TRANSACTIONS = [
     date: 'Jan 14, 2025',
     name: 'TATA Power',
     sub: 'Electricity Bill',
-    avatarBg: '#F59E0B', avatarText: '⚡',
+    avatarBg: '#F59E0B', avatarText: 'T',
     amount: '-₹1,245', status: 'success', positive: false,
   },
   {
@@ -56,224 +60,171 @@ const SAVED_BILLERS = [
 ];
 
 const SCHEDULED = [
-  { emoji: '👩', bg: '#FEF3C7', label: '₹9,000 to Mom',       bold: 'Mom',      sub: 'Every 1st of month'  },
-  { emoji: '📶', bg: '#DBEAFE', label: '₹8,500 for Internet', bold: 'Internet', sub: 'Next: Oct 30, 2025'  },
-  { emoji: '🏠', bg: '#EDE9FE', label: '₹15,000 to Landlord', bold: 'Landlord', sub: 'Next: Nov 1, 2025'   },
+  { icon: User,     to: 'Mom',      amount: '₹9,000',  sub: 'Monthly · 1st'      },
+  { icon: Wifi,     to: 'Internet', amount: '₹8,500',  sub: 'Next on Oct 30'     },
+  { icon: HomeIcon, to: 'Landlord', amount: '₹15,000', sub: 'Next on Nov 1'      },
 ];
 
 const TX_TABS = ['All', 'Sent', 'Received', 'Bills'];
 
 /* ── Sub-components ─────────────────────────────────── */
-const QuickAction = ({ icon: Icon, label, sub }) => (
-  <button className="flex-1 flex flex-col items-center gap-2 py-4 bg-white rounded-card 
-    hover:shadow-card-hover transition-shadow cursor-pointer">
-<div className="w-11 h-11 rounded-xl bg-slate-100 flex items-center justify-center">
-      <Icon size={19} className="text-primary" />
-    </div>
-    <div className="text-center">
-      <p className="text-[13px] font-semibold text-navy">{label}</p>
-      <p className="text-[11px] text-muted">{sub}</p>
-    </div>
-  </button>
-);
-
 const CashflowTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null;
   return (
     <div className="bg-white border border-border rounded-xl shadow-card px-3 py-2 text-xs">
       <p className="font-semibold text-navy mb-1">{label}</p>
-      <p className="text-positive font-medium">In: {payload[0]?.value}k</p>
-      <p className="text-negative font-medium">Out: {payload[1]?.value}k</p>
+      <p className="text-primary font-medium">In: ₹{payload[0]?.value}k</p>
+      <p className="text-red-500 font-medium">Out: ₹{payload[1]?.value}k</p>
     </div>
   );
 };
 
+const LINKED = [
+  { abbr: 'SBI',  bg: '#1e5fa8', name: 'State Bank of India', num: '•••• 4567', primary: true  },
+  { abbr: 'HDFC', bg: '#d4002a', name: 'HDFC Bank',           num: '•••• 8812', primary: false },
+];
+
 /* ── Page ───────────────────────────────────────────── */
 export default function Payments() {
-  const [txTab, setTxTab]         = useState('All');
-  const [showBalance, setShowBalance] = useState(false);
+  const [txTab, setTxTab]             = useState('All');
+  const [showBalance, setShowBalance] = useState(true);
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-6">
+
+      <PageHeader title="Payments" subtitle="Send, request and pay bills from your linked accounts." />
 
       {/* ── Quick actions ── */}
       <div className="flex gap-4">
-        <QuickAction icon={Send}       label="Send Money"    sub="Transfer instantly, anytime"  />
-        <QuickAction icon={HandCoins}  label="Request Money" sub="Ask & receive in one tap"     />
-        <QuickAction icon={PlusCircle} label="Add Money"     sub="Top-up wallet in one click"   />
-        <QuickAction icon={Receipt}    label="Pay Bill"      sub="Settle utilities in seconds"   />
+        <QuickAction icon={Send}       label="Send Money"    sub="Transfer instantly, anytime" />
+        <QuickAction icon={HandCoins}  label="Request Money" sub="Ask & receive in one tap"    />
+        <QuickAction icon={PlusCircle} label="Add Money"     sub="Top up your wallet"          />
+        <QuickAction icon={Receipt}    label="Pay Bill"      sub="Settle utilities in seconds" />
       </div>
 
       {/* ── Balance + Cashflow ── */}
-      <div className="grid grid-cols-[1fr_340px] gap-4">
+      <div className="grid grid-cols-[1fr_380px] gap-4">
 
         {/* Balance Overview */}
-        <div className="card flex flex-col gap-4">
-          <div>
-          <p className="font-display text-[20px] font-bold font-Denton text-navy mb-4">Balance Overview</p>
-            {/* Blurred / revealed balance */}
-            <p
-              className="text-[30px] font-bold text-navy tracking-tight leading-none mb-1 cursor-pointer select-none"
-              style={{ filter: showBalance ? 'none' : 'blur(0)' }}
-              onClick={() => setShowBalance(!showBalance)}
-            >
-              ₹1,83,342
-            </p>
-            <p
-              className="text-[11px] text-muted font-medium uppercase tracking-wider cursor-pointer"
-              onClick={() => setShowBalance(!showBalance)}
-            >
-              {showBalance ? 'Tap to hide balance' : 'Tap to view balance'}
-            </p>
+        <div className="card flex flex-col justify-between gap-6">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <p className="eyebrow">Available balance</p>
+                <button onClick={() => setShowBalance(!showBalance)}
+                  className="text-subtle hover:text-navy transition" title={showBalance ? 'Hide balance' : 'Show balance'}>
+                  {showBalance ? <EyeOff size={14} /> : <Eye size={14} />}
+                </button>
+              </div>
+              <p className="text-[36px] font-bold text-navy tracking-[-0.02em] leading-none mt-3 tabular-nums">
+                {showBalance ? '₹1,83,342' : '₹ ••••••'}
+              </p>
+              <p className="text-[13px] text-muted mt-2">Across 2 linked accounts</p>
+            </div>
+            <div className="flex gap-2">
+              <button className="btn-ghost"><KeyRound size={14} /> UPI PIN</button>
+              <button className="btn-outline"><ArrowUpRight size={14} /> Withdraw</button>
+              <button className="btn-primary"><FileText size={14} /> Statement</button>
+            </div>
           </div>
 
-          {/* Action buttons */}
-          <div className="flex gap-2 flex-wrap">
-            <button className="btn-primary">
-              <FileText size={13} /> Account Statement
-            </button>
-            <button className="btn-outline">
-              <ArrowUpRight size={13} /> Withdraw Funds
-            </button>
-            <button className="btn-ghost">
-              ••• Manage UPI PIN
-            </button>
+          {/* This month */}
+          <div className="grid grid-cols-3 rounded-xl border border-[#EEF1F5] divide-x divide-[#EEF1F5]">
+            {[
+              { label: 'Spent this month', value: '₹42,310',   tone: 'text-navy' },
+              { label: 'Received',         value: '₹1,05,000', tone: 'text-positive' },
+              { label: 'Bills due',        value: '₹1,598',    tone: 'text-amber-700' },
+            ].map((m) => (
+              <div key={m.label} className="px-4 py-3">
+                <p className="text-[12px] text-muted">{m.label}</p>
+                <p className={`text-[17px] font-bold mt-0.5 tabular-nums ${m.tone}`}>{m.value}</p>
+              </div>
+            ))}
           </div>
 
           {/* Linked Accounts */}
           <div>
-            <p className="text-[11px] font-semibold text-muted mb-2 uppercase tracking-wider">
-              Linked Accounts
-            </p>
-            <div className="flex flex-col gap-2">
-              {[
-                { abbr: 'SBI',  bg: '#1e5fa8', name: 'State Bank of India', num: '****4567', on: true  },
-                { abbr: 'HDFC', bg: '#d4002a', name: 'HDFC Bank',           num: '****4567', on: false },
-              ].map((a) => (
-                <div key={a.abbr}
-                  className="flex items-center justify-between bg-surface rounded-xl px-3 py-2.5">
-                  <div className="flex items-center gap-2.5">
-                    <div
-                      className="w-9 h-9 rounded-xl flex items-center justify-center text-white text-[10px] font-bold"
-                      style={{ background: a.bg }}
-                    >
-                      {a.abbr}
-                    </div>
-                    <div>
-                      <p className="text-[12px] font-semibold text-navy">{a.name}</p>
-                      <p className="text-[11px] text-muted">{a.num}</p>
-                    </div>
+            <p className="eyebrow mb-2.5">Linked accounts</p>
+            <div className="grid grid-cols-2 gap-2.5">
+              {LINKED.map((a) => (
+                <div key={a.abbr} className="list-row">
+                  <div className="w-9 h-9 rounded-lg flex items-center justify-center text-white text-[10px] font-bold shrink-0"
+                    style={{ background: a.bg }}>
+                    {a.abbr}
                   </div>
-                  {/* Toggle */}
-                  <div
-                    className={`w-10 h-[22px] rounded-full transition-colors relative cursor-pointer
-                      ${a.on ? 'bg-primary' : 'bg-slate-200'}`}
-                  >
-                    <div
-                      className={`w-[18px] h-[18px] bg-white rounded-full absolute top-0.5 shadow-sm transition-all
-                        ${a.on ? 'right-0.5' : 'left-0.5'}`}
-                    />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[13px] font-semibold text-navy truncate">{a.name}</p>
+                    <p className="text-[12px] text-muted tabular-nums">{a.num}</p>
                   </div>
+                  {a.primary
+                    ? <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-primary/10 text-primary">Primary</span>
+                    : <button className="text-[12px] font-semibold text-muted hover:text-navy">Set primary</button>}
                 </div>
               ))}
             </div>
           </div>
         </div>
 
-        {/* Cashflow Chart */}
-        <div className="card flex flex-col gap-3">
-          {/* Incoming / Outgoing tiles */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="bg-surface rounded-xl px-3 py-2.5 flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-full bg-positive flex items-center justify-center shrink-0">
-                <ArrowDownLeft size={14} className="text-white" />
-              </div>
-              <div>
-                <p className="text-[10px] text-muted">Incoming</p>
-                <p className="text-[15px] font-bold text-positive">₹9,54,232</p>
-              </div>
+        {/* Cashflow */}
+        <div className="card flex flex-col">
+          <SectionHeader title="Cash Flow" subtitle="Last 5 months" />
+          <div className="grid grid-cols-2 gap-2.5">
+            <div className="rounded-xl border border-[#EEF1F5] bg-[#F8FAFC] px-3.5 py-3">
+              <p className="text-[12px] text-muted flex items-center gap-1.5">
+                <ArrowDownLeft size={13} className="text-primary" /> Incoming
+              </p>
+              <p className="text-[18px] font-bold text-navy mt-1 tabular-nums">₹9,54,232</p>
             </div>
-            <div className="bg-surface rounded-xl px-3 py-2.5 flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-full bg-negative flex items-center justify-center shrink-0">
-                <ArrowUpRight size={14} className="text-white" />
-              </div>
-              <div>
-                <p className="text-[10px] text-muted">Outgoing</p>
-                <p className="text-[15px] font-bold text-negative">₹3,31,245</p>
-              </div>
+            <div className="rounded-xl border border-[#EEF1F5] bg-[#F8FAFC] px-3.5 py-3">
+              <p className="text-[12px] text-muted flex items-center gap-1.5">
+                <ArrowUpRight size={13} className="text-red-500" /> Outgoing
+              </p>
+              <p className="text-[18px] font-bold text-navy mt-1 tabular-nums">₹3,31,245</p>
             </div>
           </div>
 
-          {/* Stacked bar chart */}
-          <div className="flex-1 h-44">
+          <div className="flex-1 min-h-[150px] mt-4">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={CASHFLOW_DATA}
-                barCategoryGap="35%"
-                margin={{ top: 4, right: 4, left: 0, bottom: 0 }}
-              >
-                <XAxis
-                  dataKey="month"
-                  tick={{ fontSize: 10, fill: '#94A3B8' }}
-                  axisLine={false}
-                  tickLine={false}
-                />
+              <BarChart data={CASHFLOW_DATA} barGap={3} barCategoryGap="30%" margin={{ top: 4, right: 0, left: 0, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#EEF1F5" vertical={false} />
+                <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#94A3B8' }} axisLine={false} tickLine={false} />
                 <YAxis hide />
-                <Tooltip content={<CashflowTooltip />} />
-                <Bar dataKey="inc" stackId="a" fill="#16A34A" radius={[0, 0, 0, 0]} />
-                <Bar dataKey="out" stackId="a" fill="#DC2626" radius={[4, 4, 0, 0]} />
+                <Tooltip content={<CashflowTooltip />} cursor={{ fill: '#F8FAFC' }} />
+                <Bar dataKey="inc" fill="#0B6E6E" radius={[4, 4, 0, 0]} maxBarSize={14} />
+                <Bar dataKey="out" fill="#FCA5A5" radius={[4, 4, 0, 0]} maxBarSize={14} />
               </BarChart>
             </ResponsiveContainer>
           </div>
 
-          {/* Stats */}
-          <div className="flex gap-4">
-            <p className="text-[11px] text-muted">
-              <span className="font-bold text-navy">30%</span> better than last month
-            </p>
-            <p className="text-[11px] text-muted">
-              <span className="font-bold text-navy">15%</span> more saved
-            </p>
-          </div>
+          <p className="text-[12px] text-muted mt-3">
+            <span className="font-semibold text-positive">30% better</span> than last month · 15% more saved
+          </p>
         </div>
       </div>
 
       {/* ── Recent Transactions ── */}
       <div className="card">
-        <div className="flex items-center justify-between mb-4">
-          <p className="font-display text-[20px] font-bold font-Denton text-navy mb-4">Recent Transactions</p>
-          <div className="flex items-center gap-0.5 bg-surface rounded-lg p-0.5">
-            {TX_TABS.map((t) => (
-              <button
-                key={t}
-                onClick={() => setTxTab(t)}
-                className={`text-[11px] px-3 py-1 rounded-md font-medium transition-all
-                  ${txTab === t
-                    ? 'bg-white text-navy shadow-sm font-semibold'
-                    : 'text-muted hover:text-navy'}`}
-              >
-                {t}
-              </button>
-            ))}
-          </div>
-        </div>
+        <SectionHeader
+          title="Recent Transactions"
+          subtitle="Payments in and out of your accounts"
+          actions={<Segmented options={TX_TABS} value={txTab} onChange={setTxTab} size="sm" />}
+        />
 
         <table className="w-full">
           <thead>
             <tr className="border-b border-border">
-              <th className="text-left pb-2.5 text-[11px] font-medium text-muted">Date</th>
-              <th className="text-left pb-2.5 text-[11px] font-medium text-muted">Recipient/Sender</th>
-              <th className="text-left pb-2.5 text-[11px] font-medium text-muted">Amount</th>
-              <th className="text-left pb-2.5 text-[11px] font-medium text-muted">Status</th>
-              <th className="text-left pb-2.5 text-[11px] font-medium text-muted">Action</th>
+              <th className="th">Recipient / Sender</th>
+              <th className="th">Date</th>
+              <th className="th">Status</th>
+              <th className="th text-right">Amount</th>
+              <th className="th text-right w-24">Receipt</th>
             </tr>
           </thead>
           <tbody>
             {TRANSACTIONS.map((tx, i) => (
-              <tr key={i} className="border-b border-border last:border-0">
-                <td className="py-3.5 text-[12px] text-muted">{tx.date}</td>
+              <tr key={i} className="tr">
                 <td className="py-3.5">
-                  <div className="flex items-center gap-2.5">
+                  <div className="flex items-center gap-3">
                     <div
                       className="w-8 h-8 rounded-full flex items-center justify-center text-white text-[12px] font-bold shrink-0"
                       style={{ background: tx.avatarBg }}
@@ -281,30 +232,25 @@ export default function Payments() {
                       {tx.avatarText}
                     </div>
                     <div>
-                      <p className="text-[12px] font-semibold text-navy">{tx.name}</p>
-                      <p className="text-[11px] text-muted">{tx.sub}</p>
+                      <p className="text-[13px] font-semibold text-navy">{tx.name}</p>
+                      <p className="text-[12px] text-muted">{tx.sub}</p>
                     </div>
                   </div>
                 </td>
-                <td className={`py-3.5 text-[13px] font-bold ${tx.positive ? 'text-positive' : 'text-negative'}`}>
+                <td className="py-3.5 text-[13px] text-muted">{tx.date}</td>
+                <td className="py-3.5"><StatusBadge status={tx.status} /></td>
+                <td className={`py-3.5 text-[14px] font-semibold text-right tabular-nums ${tx.positive ? 'text-positive' : 'text-navy'}`}>
                   {tx.amount}
                 </td>
-                <td className="py-3.5">
-                  <StatusBadge status={tx.status} />
-                </td>
-                <td className="py-3.5">
-                  <button className="text-[12px] text-primary font-semibold hover:underline">
-                    Receipt
-                  </button>
+                <td className="py-3.5 text-right">
+                  <button className="text-[13px] text-primary font-semibold hover:underline">View</button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
 
-        <button className="text-[12px] text-primary font-semibold mt-3 flex items-center gap-1 hover:underline">
-          Show all transactions →
-        </button>
+        <button className="link-action mt-4">Show all transactions <ArrowRight size={14} /></button>
       </div>
 
       {/* ── Bills & Scheduled ── */}
@@ -312,98 +258,68 @@ export default function Payments() {
 
         {/* Bills & Payments */}
         <div className="card">
-          <div className="flex items-center justify-between mb-4">
-          <p className="font-display text-[20px] font-bold font-Denton text-navy mb-4">Bills & Payments</p>
-            <button className="flex items-center gap-1 text-[12px] text-primary font-medium hover:underline">
-              Manage <Settings size={12} />
-            </button>
-          </div>
+          <SectionHeader
+            title="Bills & Payments"
+            subtitle="Pay any biller in two taps"
+            actions={<button className="link-action"><Settings size={14} /> Manage</button>}
+          />
 
-          {/* Biller grid */}
-          <div className="grid grid-cols-3 gap-2 mb-5">
+          <div className="grid grid-cols-6 gap-1 mb-5">
             {BILLERS.map(({ icon: Icon, label, bg, color }) => (
               <button
                 key={label}
-                className="flex flex-col items-center gap-1.5 py-3 rounded-xl hover:bg-surface transition-colors"
+                className="flex flex-col items-center gap-2 py-2.5 rounded-xl hover:bg-[#F8FAFC] transition-colors"
               >
-                <div
-                  className="w-10 h-10 rounded-xl flex items-center justify-center"
-                  style={{ background: bg }}
-                >
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: bg }}>
                   <Icon size={18} style={{ color }} />
                 </div>
-                <span className="text-[11px] text-muted font-medium">{label}</span>
+                <span className="text-[12px] text-slate-600 font-medium">{label}</span>
               </button>
             ))}
           </div>
 
-          {/* Saved Billers */}
-          <p className="text-[11px] font-semibold text-muted uppercase tracking-wider mb-2">
-            Saved Billers
-          </p>
-          <div className="flex flex-col gap-3">
+          <p className="eyebrow mb-2.5">Saved billers</p>
+          <div className="flex flex-col gap-2.5">
             {SAVED_BILLERS.map((b) => (
-              <div key={b.name} className="flex items-center justify-between">
-                <div className="flex items-center gap-2.5">
-                  <div
-                    className="w-8 h-8 rounded-lg flex items-center justify-center"
-                    style={{ background: b.iconBg }}
-                  >
-                    <b.icon size={14} style={{ color: b.iconColor }} />
-                  </div>
-                  <div>
-                    <p className="text-[12px] font-semibold text-navy">{b.name}</p>
-                    <p className="text-[11px] text-muted">Due: {b.due}</p>
-                  </div>
+              <div key={b.name} className="list-row">
+                <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style={{ background: b.iconBg }}>
+                  <b.icon size={15} style={{ color: b.iconColor }} />
                 </div>
-                <button className="btn-primary py-1 px-3 text-[11px]">Pay Now</button>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[13px] font-semibold text-navy">{b.name}</p>
+                  <p className="text-[12px] text-muted">Due <span className="font-semibold text-navy tabular-nums">{b.due}</span></p>
+                </div>
+                <button className="btn-primary py-1.5 px-3 text-[12px]">Pay now</button>
               </div>
             ))}
           </div>
         </div>
 
         {/* Scheduled Transfers */}
-        <div className="card">
-          <p className="font-display text-[20px] font-bold font-Denton text-navy mb-4">Scheduled Transfers</p>
-          <div className="flex flex-col gap-3">
-            {SCHEDULED.map((s, i) => (
-              <div
-                key={i}
-                className="flex items-center justify-between bg-surface rounded-xl px-3 py-3"
-              >
-                <div className="flex items-center gap-3">
-                  <div
-                    className="w-9 h-9 rounded-xl flex items-center justify-center text-[18px]"
-                    style={{ background: s.bg }}
-                  >
-                    {s.emoji}
-                  </div>
-                  <div>
-                    {/* Bold the name within the label */}
-                    <p className="text-[12px] font-semibold text-navy">
-                      {s.label.split(s.bold).map((part, j, arr) =>
-                        j < arr.length - 1
-                          ? <span key={j}>{part}<span className="text-primary">{s.bold}</span></span>
-                          : <span key={j}>{part}</span>
-                      )}
-                    </p>
-                    <p className="text-[11px] text-muted">{s.sub}</p>
-                  </div>
+        <div className="card flex flex-col">
+          <SectionHeader
+            title="Scheduled Transfers"
+            subtitle="Recurring payments on autopilot"
+            actions={<button className="link-action"><Plus size={14} /> New</button>}
+          />
+          <div className="flex flex-col gap-2.5">
+            {SCHEDULED.map((s) => (
+              <div key={s.to} className="list-row">
+                <div className="w-9 h-9 rounded-lg bg-white border border-border text-navy flex items-center justify-center shrink-0">
+                  <s.icon size={16} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[13px] font-semibold text-navy">
+                    <span className="tabular-nums">{s.amount}</span> <span className="font-normal text-muted">to</span> {s.to}
+                  </p>
+                  <p className="text-[12px] text-muted">{s.sub}</p>
                 </div>
                 <div className="flex gap-1.5">
-                  <button className="w-7 h-7 rounded-lg bg-white border border-border flex items-center justify-center hover:border-primary transition-colors">
-                    <Edit2 size={12} className="text-muted" />
-                  </button>
-                  <button className="w-7 h-7 rounded-lg bg-white border border-border flex items-center justify-center hover:border-negative transition-colors">
-                    <Trash2 size={12} className="text-muted" />
-                  </button>
+                  <button className="icon-btn" title="Edit"><Edit2 size={13} /></button>
+                  <button className="icon-btn hover:!text-negative hover:!border-red-200" title="Delete"><Trash2 size={13} /></button>
                 </div>
               </div>
             ))}
-
-            <button className="flex items-center gap-2 text-[12px] text-primary font-semibold mt-1 hover:underline">
-              <Plus size={13} /> Add New Transfer
-            </button>
           </div>
         </div>
       </div>
